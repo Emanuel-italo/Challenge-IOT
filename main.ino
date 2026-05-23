@@ -252,3 +252,7 @@ void publicarTelemetria(float temp, float umid, float dist, StatusSaude status) 
   doc["status_saude"] = (status == VERDE) ? "verde" : (status == AMARELO ? "amarelo" : "vermelho");
   doc["led_remoto"]   = ledRemotoEstado ? "on" : "off";
   doc["timestamp"]    = millis();
+
+char buffer[256];
+  serializeJson(doc, buffer);
+  MQTT.publish(TOPIC_PUB_TELEMETRIA, buffer);
