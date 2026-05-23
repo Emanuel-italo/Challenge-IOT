@@ -275,3 +275,8 @@ void publicarAlerta(const char* mensagem, StatusSaude status) {
   MQTT.publish(TOPIC_PUB_ALERTA, buffer);
   Serial.printf("[ALERTA] %s\n", mensagem);
 }
+
+void callbackMQTT(char* topic, byte* payload, unsigned int length) {
+  String msg;
+  for (unsigned int i = 0; i < length; i++) msg += (char)payload[i];
+  Serial.printf("Comando recebido em %s: %s\n", topic, msg.c_str());
