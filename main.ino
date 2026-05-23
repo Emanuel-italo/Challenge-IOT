@@ -210,3 +210,5 @@ bool inativo = (ciclosInativos >= LIMITE_INATIVIDADE);
 
     return VERDE;
 }
+
+void atualizarLedRGB(StatusSaude status) {
