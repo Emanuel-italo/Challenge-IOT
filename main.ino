@@ -66,3 +66,20 @@ void atualizarLedRGB(StatusSaude status);
 void tocarAlerta(StatusSaude status);
 void publicarTelemetria(float temp, float umid, float dist, StatusSaude status);
 void publicarAlerta(const char* mensagem, StatusSaude status);
+
+
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("\n=== CLYVO PET — Wearable IoT iniciando ===");
+
+  // Configura pinos de atuadores
+  pinMode(PIN_LED_R, OUTPUT);
+  pinMode(PIN_LED_G, OUTPUT);
+  pinMode(PIN_LED_B, OUTPUT);
+  pinMode(PIN_BUZZER, OUTPUT);
+  pinMode(PIN_LED_REMOTO, OUTPUT);
+
+  // Configura pinos do sensor ultrassônico
+  pinMode(PIN_TRIG, OUTPUT);
+  pinMode(PIN_ECHO, INPUT);
