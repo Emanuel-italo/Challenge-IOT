@@ -219,3 +219,5 @@ void atualizarLedRGB(StatusSaude status) {
       switch (status) {
     case VERDE:
       digitalWrite(PIN_LED_G, HIGH);
+            break;
+    case AMARELO:
