@@ -53,3 +53,16 @@ bool ledRemotoEstado = false;
 
 // Estados de score de risco
 enum StatusSaude { VERDE, AMARELO, VERMELHO };
+
+
+void initWiFi();
+void initMQTT();
+void callbackMQTT(char* topic, byte* payload, unsigned int length);
+void reconectaMQTT();
+void verificaConexoes();
+float lerDistancia();
+StatusSaude calcularScoreRisco(float temp, float distancia);
+void atualizarLedRGB(StatusSaude status);
+void tocarAlerta(StatusSaude status);
+void publicarTelemetria(float temp, float umid, float dist, StatusSaude status);
+void publicarAlerta(const char* mensagem, StatusSaude status);
