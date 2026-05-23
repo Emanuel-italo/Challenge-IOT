@@ -38,3 +38,6 @@ const float TEMP_MIN_SAUDAVEL = 37.5;
 const float TEMP_MAX_SAUDAVEL = 39.2;
 const float TEMP_LIMITE_ALERTA_INF = 36.5;  // hipotermia
 const float TEMP_LIMITE_ALERTA_SUP = 40.0;  // febre alta
+
+const int DISTANCIA_PROXIMA_CM = 30;   // pet próximo do tutor / em repouso confortável
+const int LIMITE_INATIVIDADE   = 10;   // ciclos consecutivos sem variação -> sedentarismo
