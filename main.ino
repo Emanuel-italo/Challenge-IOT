@@ -230,3 +230,13 @@ void atualizarLedRGB(StatusSaude status) {
       break;
   }
 }
+
+void tocarAlerta(StatusSaude status) {
+  if (status == VERMELHO) {
+    tone(PIN_BUZZER, 1500, 200);
+    delay(250);
+    tone(PIN_BUZZER, 1500, 200);
+  } else {
+    noTone(PIN_BUZZER);
+  }
+}
