@@ -157,3 +157,22 @@ void initWiFi() {
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
 }
+
+void initMQTT() {
+  MQTT.setServer(BROKER_MQTT, BROKER_PORT);
+  MQTT.setCallback(callbackMQTT);
+}
+
+void reconectaMQTT() {
+  while (!MQTT.connected()) {
+    Serial.print("Conectando ao broker MQTT...");
+    if (MQTT.connect(ID_MQTT)) {
+      Serial.println(" conectado!");
+      MQTT.subscribe(TOPIC_SUB_COMANDO);
+      Serial.printf("Inscrito em: %s\n", TOPIC_SUB_COMANDO);
+    } else {
+      Serial.printf(" falha (rc=%d). Tentando em 2s.\n", MQTT.state());
+      delay(2000);
+    }
+  }
+}
