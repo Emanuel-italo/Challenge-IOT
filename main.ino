@@ -98,3 +98,25 @@ void setup() {
   Serial.println("Sistema CLYVO PET pronto para monitorar.");
   delay(1000);
 }
+
+// =====================================================================================
+//  LOOP PRINCIPAL
+// =====================================================================================
+void loop() {
+  verificaConexoes();
+  MQTT.loop();
+
+  if (millis() - ultimaPublicacao >= INTERVALO_PUBLICACAO) {
+    ultimaPublicacao = millis();
+
+    // ---- Leitura dos sensores ----
+    TempAndHumidity dados = dht.getTempAndHumidity();
+    float temperatura = dados.temperature;
+    float umidade     = dados.humidity;
+    float distancia   = lerDistancia();
+
+    // Trata leitura inválida
+    if (isnan(temperatura) || isnan(umidade)) {
+      Serial.println("Falha na leitura do DHT22 — pulando ciclo.");
+      return;
+    }
