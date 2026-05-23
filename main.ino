@@ -194,3 +194,9 @@ float lerDistancia() {
   float distancia = duracao * 0.0343 / 2.0;
   return distancia;
 }
+
+StatusSaude calcularScoreRisco(float temp, float distancia) {
+  // Faixa crítica de temperatura -> VERMELHO
+  if (temp < TEMP_LIMITE_ALERTA_INF || temp > TEMP_LIMITE_ALERTA_SUP) {
+    return VERMELHO;
+  }
