@@ -287,3 +287,10 @@ void callbackMQTT(char* topic, byte* payload, unsigned int length) {
     Serial.println("JSON inválido no comando.");
     return;
   }
+
+    if (json["led"].is<int>()) {
+    int valor = json["led"];
+    ledRemotoEstado = (valor == 1);
+    digitalWrite(PIN_LED_REMOTO, ledRemotoEstado ? HIGH : LOW);
+    Serial.printf("LED remoto -> %s\n", ledRemotoEstado ? "LIGADO" : "DESLIGADO");
+  }
