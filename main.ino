@@ -30,3 +30,5 @@ const char* ID_MQTT      = "clyvo_pet_esp32_001";
 const char* TOPIC_PUB_TELEMETRIA = "clyvo/pet/telemetria";
 const char* TOPIC_SUB_COMANDO    = "clyvo/pet/comando";
 const char* TOPIC_PUB_ALERTA     = "clyvo/pet/alerta";
+
+#define INTERVALO_PUBLICACAO 3000   // 3 segundos entre leituras
