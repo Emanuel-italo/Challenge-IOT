@@ -240,3 +240,8 @@ void tocarAlerta(StatusSaude status) {
     noTone(PIN_BUZZER);
   }
 }
+
+void publicarTelemetria(float temp, float umid, float dist, StatusSaude status) {
+  JsonDocument doc;
+  doc["pet_id"]       = "PET001";
+  doc["nome"]         = "Rex";
