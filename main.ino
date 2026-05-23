@@ -200,3 +200,6 @@ StatusSaude calcularScoreRisco(float temp, float distancia) {
   if (temp < TEMP_LIMITE_ALERTA_INF || temp > TEMP_LIMITE_ALERTA_SUP) {
     return VERMELHO;
   }
+
+bool tempLimitrofe = (temp < TEMP_MIN_SAUDAVEL || temp > TEMP_MAX_SAUDAVEL);
+bool inativo = (ciclosInativos >= LIMITE_INATIVIDADE);
