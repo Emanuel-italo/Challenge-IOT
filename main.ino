@@ -207,3 +207,6 @@ bool inativo = (ciclosInativos >= LIMITE_INATIVIDADE);
   if (tempLimitrofe || inativo) {
     return AMARELO;
   }
+
+    return VERDE;
+}
