@@ -14,3 +14,5 @@
 #define PIN_LED_B     23
 
 #define PIN_BUZZER    13
+
+#define PIN_LED_REMOTO 15
