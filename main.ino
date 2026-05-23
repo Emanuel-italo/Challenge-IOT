@@ -245,3 +245,10 @@ void publicarTelemetria(float temp, float umid, float dist, StatusSaude status) 
   JsonDocument doc;
   doc["pet_id"]       = "PET001";
   doc["nome"]         = "Rex";
+  doc["temperatura"]  = temp;
+  doc["umidade"]      = umid;
+  doc["distancia_cm"] = dist;
+  doc["atividade"]    = (dist < DISTANCIA_PROXIMA_CM) ? "repouso" : "ativo";
+  doc["status_saude"] = (status == VERDE) ? "verde" : (status == AMARELO ? "amarelo" : "vermelho");
+  doc["led_remoto"]   = ledRemotoEstado ? "on" : "off";
+  doc["timestamp"]    = millis();
