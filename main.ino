@@ -280,3 +280,10 @@ void callbackMQTT(char* topic, byte* payload, unsigned int length) {
   String msg;
   for (unsigned int i = 0; i < length; i++) msg += (char)payload[i];
   Serial.printf("Comando recebido em %s: %s\n", topic, msg.c_str());
+
+   JsonDocument json;
+  DeserializationError err = deserializeJson(json, msg);
+  if (err) {
+    Serial.println("JSON inválido no comando.");
+    return;
+  }
