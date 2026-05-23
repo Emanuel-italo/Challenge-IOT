@@ -226,3 +226,7 @@ void atualizarLedRGB(StatusSaude status) {
       digitalWrite(PIN_LED_G, HIGH);
       break;
     case VERMELHO:
+          digitalWrite(PIN_LED_R, HIGH);
+      break;
+  }
+}
