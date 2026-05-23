@@ -144,3 +144,16 @@ void loop() {
                   temperatura, umidade, distancia, status, ciclosInativos);
   }
 }
+
+void initWiFi() {
+  Serial.print("Conectando ao WiFi: ");
+  Serial.println(SSID);
+  WiFi.begin(SSID, PASSWORD);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(200);
+    Serial.print(".");
+  }
+  Serial.println("\nWiFi conectado!");
+  Serial.print("IP: ");
+  Serial.println(WiFi.localIP());
+}
