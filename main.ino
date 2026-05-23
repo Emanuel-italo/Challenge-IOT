@@ -12,3 +12,5 @@
 #define PIN_LED_R     21
 #define PIN_LED_G     22
 #define PIN_LED_B     23
+
+#define PIN_BUZZER    13
