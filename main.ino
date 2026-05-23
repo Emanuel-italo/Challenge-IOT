@@ -181,3 +181,16 @@ void verificaConexoes() {
   if (WiFi.status() != WL_CONNECTED) initWiFi();
   if (!MQTT.connected()) reconectaMQTT();
 }
+
+float lerDistancia() {
+  digitalWrite(PIN_TRIG, LOW);
+  delayMicroseconds(2);
+  digitalWrite(PIN_TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(PIN_TRIG, LOW);
+
+  long duracao = pulseIn(PIN_ECHO, HIGH, 30000); // timeout 30ms
+  if (duracao == 0) return 400.0; // fora de alcance
+  float distancia = duracao * 0.0343 / 2.0;
+  return distancia;
+}
