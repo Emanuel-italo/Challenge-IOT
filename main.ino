@@ -262,3 +262,16 @@ char buffer[256];
     publicarAlerta("Alerta crítico: temperatura fora da faixa segura!", status);
   }
 }
+
+void publicarAlerta(const char* mensagem, StatusSaude status) {
+  JsonDocument doc;
+  doc["pet_id"]   = "PET001";
+  doc["nivel"]    = (status == VERMELHO) ? "critico" : "atencao";
+  doc["mensagem"] = mensagem;
+  doc["timestamp"] = millis();
+
+  char buffer[200];
+  serializeJson(doc, buffer);
+  MQTT.publish(TOPIC_PUB_ALERTA, buffer);
+  Serial.printf("[ALERTA] %s\n", mensagem);
+}
