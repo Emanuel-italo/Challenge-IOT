@@ -294,3 +294,14 @@ void callbackMQTT(char* topic, byte* payload, unsigned int length) {
     digitalWrite(PIN_LED_REMOTO, ledRemotoEstado ? HIGH : LOW);
     Serial.printf("LED remoto -> %s\n", ledRemotoEstado ? "LIGADO" : "DESLIGADO");
   }
+
+    // Comando: tocar alerta sonoro (ex.: lembrete de medicação enviado pelo app)
+  if (json["alerta_medicacao"].is<bool>() && json["alerta_medicacao"]) {
+    Serial.println("Tocando lembrete de medicação...");
+    for (int i = 0; i < 3; i++) {
+      tone(PIN_BUZZER, 1000, 200);
+      delay(300);
+    }
+    noTone(PIN_BUZZER);
+  }
+}
