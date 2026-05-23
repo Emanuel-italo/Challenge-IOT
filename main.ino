@@ -3,3 +3,5 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include <DHTesp.h>
+
+#define PIN_DHT       12
