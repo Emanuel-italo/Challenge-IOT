@@ -256,3 +256,9 @@ void publicarTelemetria(float temp, float umid, float dist, StatusSaude status) 
 char buffer[256];
   serializeJson(doc, buffer);
   MQTT.publish(TOPIC_PUB_TELEMETRIA, buffer);
+
+
+  if (status == VERMELHO) {
+    publicarAlerta("Alerta crítico: temperatura fora da faixa segura!", status);
+  }
+}
