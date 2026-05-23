@@ -120,3 +120,27 @@ void loop() {
       Serial.println("Falha na leitura do DHT22 — pulando ciclo.");
       return;
     }
+
+    // ---- Detecção de inatividade do pet ----
+    if (ultimaDistancia >= 0 && fabs(distancia - ultimaDistancia) < 2.0) {
+      ciclosInativos++;
+    } else {
+      ciclosInativos = 0;
+    }
+    ultimaDistancia = distancia;
+
+    // ---- Calcula score de risco ----
+    StatusSaude status = calcularScoreRisco(temperatura, distancia);
+
+    // ---- Aciona atuadores ----
+    atualizarLedRGB(status);
+    tocarAlerta(status);
+
+    // ---- Envia telemetria via MQTT ----
+    publicarTelemetria(temperatura, umidade, distancia, status);
+
+    // ---- Logs no Serial ----
+    Serial.printf("Temp: %.1f°C | Umid: %.1f%% | Dist: %.1fcm | Status: %d | Inativo: %d\n",
+                  temperatura, umidade, distancia, status, ciclosInativos);
+  }
+}
