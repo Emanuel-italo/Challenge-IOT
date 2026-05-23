@@ -41,3 +41,15 @@ const float TEMP_LIMITE_ALERTA_SUP = 40.0;  // febre alta
 
 const int DISTANCIA_PROXIMA_CM = 30;   // pet próximo do tutor / em repouso confortável
 const int LIMITE_INATIVIDADE   = 10;   // ciclos consecutivos sem variação -> sedentarismo
+
+WiFiClient espClient;
+PubSubClient MQTT(espClient);
+DHTesp dht;
+
+unsigned long ultimaPublicacao = 0;
+int ciclosInativos = 0;
+float ultimaDistancia = -1;
+bool ledRemotoEstado = false;
+
+// Estados de score de risco
+enum StatusSaude { VERDE, AMARELO, VERMELHO };
