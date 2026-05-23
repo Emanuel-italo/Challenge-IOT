@@ -83,3 +83,18 @@ void setup() {
   // Configura pinos do sensor ultrassônico
   pinMode(PIN_TRIG, OUTPUT);
   pinMode(PIN_ECHO, INPUT);
+
+   // Inicializa DHT22
+  dht.setup(PIN_DHT, DHTesp::DHT22);
+
+  // Estado inicial dos LEDs
+  digitalWrite(PIN_LED_REMOTO, LOW);
+  atualizarLedRGB(VERDE);
+
+  // Conecta WiFi e MQTT
+  initWiFi();
+  initMQTT();
+
+  Serial.println("Sistema CLYVO PET pronto para monitorar.");
+  delay(1000);
+}
