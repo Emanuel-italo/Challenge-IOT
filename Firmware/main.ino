@@ -30,10 +30,10 @@ PubSubClient MQTT(espClient);
 unsigned long ultimaPublicacao = 0;
 int statusAnterior = -1;
 
-// --- MOTOR FISIOLÓGICO (Sem dados mockados estáticos) ---
+
 bool emAtividade = false;
-float tempCorporal = 38.0; // Temperatura de repouso saudável
-int bpmAtual = 75;         // Batimentos de repouso
+float tempCorporal = 38.0; 
+int bpmAtual = 75;        
 float distanciaTotalMetros = 0.0;
 bool ledRemotoEstado = false;
 
@@ -71,31 +71,31 @@ void loop() {
   if (millis() - ultimaPublicacao >= INTERVALO_PUBLICACAO) {
     ultimaPublicacao = millis();
 
-    // === LÓGICA DINÂMICA DO METABOLISMO ===
+    
     if (emAtividade) {
-      // Pet se exercitando: Sinais vitais sobem gradativamente
+ 
       bpmAtual += random(4, 10);
-      if (bpmAtual > 165) bpmAtual = 165; // Teto cardíaco
+      if (bpmAtual > 165) bpmAtual = 165; 
 
-      tempCorporal += random(1, 3) / 10.0; // Sobe de 0.1 a 0.2 graus
-      if (tempCorporal > 40.5) tempCorporal = 40.5; // Teto de temperatura
+      tempCorporal += random(1, 3) / 10.0; 
+      if (tempCorporal > 40.5) tempCorporal = 40.5; 
 
-      distanciaTotalMetros += random(30, 80) / 10.0; // Avança de 3 a 8 metros
+      distanciaTotalMetros += random(30, 80) / 10.0; 
     } else {
-      // Pet em repouso: Sinais vitais caem e estabilizam
+    
       bpmAtual -= random(3, 8);
-      if (bpmAtual < 75) bpmAtual = 75 + random(-2, 3); // Oscilação natural de repouso
+      if (bpmAtual < 75) bpmAtual = 75 + random(-2, 3); 
 
-      tempCorporal -= random(1, 2) / 10.0; // Resfria 0.1
-      if (tempCorporal < 38.0) tempCorporal = 38.0 + (random(0, 2) / 10.0); // Normal
+      tempCorporal -= random(1, 2) / 10.0; 
+      if (tempCorporal < 38.0) tempCorporal = 38.0 + (random(0, 2) / 10.0);
     }
 
-    // === DEFINIÇÃO DE STATUS DE SAÚDE ===
+  
     int status = STATUS_VERDE;
     if (tempCorporal >= 39.5 || bpmAtual >= 150) {
-      status = STATUS_VERMELHO; // Crítico: Febre ou Taquicardia
+      status = STATUS_VERMELHO; 
     } else if (emAtividade) {
-      status = STATUS_AMARELO;  // Amarelo: Agitado / Se exercitando
+      status = STATUS_AMARELO;  
     }
 
     atualizarLedRGB(status);
@@ -106,7 +106,7 @@ void loop() {
 
     publicarTelemetria(status);
 
-    // Gestão inteligente de alertas
+
     if (status != statusAnterior) {
       if (status == STATUS_VERDE) {
         publicarAlerta("Os sinais vitais do pet normalizaram. Em repouso.", "info");
@@ -189,13 +189,13 @@ void callbackMQTT(char* topic, byte* payload, unsigned int length) {
   DeserializationError err = deserializeJson(json, msg);
   if (err) return;
 
-  // Gatilho Principal vindo do App do Tutor
+
   if (json["atividade"].is<bool>()) {
     emAtividade = json["atividade"];
     Serial.println(emAtividade ? ">>> INICIO DE ATIVIDADE <<<" : ">>> FIM DE ATIVIDADE <<<");
   }
 
-  // Comandos administrativos
+
   if (json["led"].is<int>()) {
     ledRemotoEstado = (json["led"] == 1);
     digitalWrite(PIN_LED_REMOTO, ledRemotoEstado ? HIGH : LOW);
