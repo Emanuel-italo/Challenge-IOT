@@ -1,5 +1,3 @@
-
-
 Integrantes:
 
 1- RM563811 Paulo Henrique Alves Estalise
@@ -9,4 +7,4 @@ Integrantes:
 
 link_git_hub: https://github.com/Emanuel-italo/Challenge-IOT
 
-link youtube:
+link video: https://www.loom.com/share/dea35ef884c24dd2baf8f8125b221f6b
