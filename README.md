@@ -1,21 +1,17 @@
-Esse seu rascunho está com um formato excelente para a correção do professor, pois pega na mão do avaliador e ensina como ver o sistema funcionando.
-
-Para que ele fique **impecável e blinde a sua nota**, eu apenas incorporei duas coisas cruciais que a FIAP exige na rubrica de correção (o edital do Challenge): a **"Estrutura do Projeto"** visualmente mapeada e os **"Resultados Parciais"** com esse nome exato, para que o professor dê o "check" imediato na hora de avaliar. Também organizei as tecnologias e requisitos em formato de fácil leitura.
-
-Aqui está a versão definitiva, polida e pronta para o seu repositório:
 
 ```markdown
 # 🐾 Clyvo Pet - Guia de Avaliação (Challenge FIAP 2026)
 
 **Disciplina:** DISRUPTIVE ARCHITECTURES: IOT, IOB & GENERATIVE IA  
 **Empresa Parceira:** Clyvo Vet  
-**Equipe:** * Emanuel Italo Leal Trindade Soares (RM561337)
+**Equipe:**
+* Emanuel Italo Leal Trindade Soares (RM561337)
 * Paulo Henrique Alves Estalise (RM563811)
 * Gabriel Bebe (RM562012)
 
 ---
 
-## 📌 Sobre o Projeto (Prova de Conceito)
+## 📌 Sobre o Projeto link github ( https://github.com/Emanuel-italo/Challenge-IOT )
 
 Este repositório contém a entrega das **Sprints 1 e 2** referentes ao desafio de criar a infraestrutura do futuro da medicina veterinária digital.
 
@@ -51,8 +47,6 @@ Para atender aos requisitos de avaliação de forma realista, **não utilizamos 
 | **Protocolo** | MQTT (HiveMQ) | Comunicação assíncrona bidirecional em tempo real de baixa latência. |
 | **Front-end** | HTML5, CSS3, JS Vanilla | Construção das interfaces limpas e responsivas. |
 | **Bibliotecas** | `PubSubClient`, `Chart.js` | Conexão IoT via WebSockets e renderização de gráficos clínicos em tela. |
-
-> **Nota de Segurança:** Para evitar ruído de outros projetos acadêmicos, a comunicação Pub/Sub está isolada sob o tópico `clyvo/pet/rm561337/#`.
 
 ---
 
