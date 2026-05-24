@@ -35,6 +35,8 @@ Para atender aos requisitos de avaliação de forma realista, **não utilizamos 
  ┣ 📂 Dashboards
  ┃ ┣ 📜 app_tutor.html    # Interface Mobile-first para o dono do pet
  ┃ ┗ 📜 ADM.html          # Painel de Triagem e Monitoramento para a Clínica
+ ┣ 📂 Json
+ ┃  ┗ 📜 para_inserir_no_projeto.json
  ┗ 📜 README.md           # Documentação principal
 
 ```
