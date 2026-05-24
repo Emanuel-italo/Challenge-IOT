@@ -9,6 +9,8 @@
 * Paulo Henrique Alves Estalise (RM563811)
 * Gabriel Bebe (RM562012)
 
+Link video: https://www.loom.com/share/dea35ef884c24dd2baf8f8125b221f6b
+
 ---
 
 ## 📌 Sobre o Projeto link github ( https://github.com/Emanuel-italo/Challenge-IOT )
