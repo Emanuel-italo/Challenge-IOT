@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clyvo Pet — App do Tutor</title>
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  <style>
+    :root {
+      --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --text-dim: #64748b;
+      --brand: #ff2d6e; --blue: #3b82f6; --green: #10b981; --yellow: #f59e0b; --red: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background-color: #cbd5e1; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+    
+    .mobile-app {
+      background-color: var(--bg); width: 100%; max-width: 414px; height: 850px; max-height: 90vh;
+      border-radius: 40px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow-y: auto; border: 8px solid #0f172a;
+    }
+    .mobile-app::-webkit-scrollbar { display: none; }
+    
+    .header { padding: 32px 24px 20px; background: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .greeting { font-size: 24px; font-weight: 800; color: var(--text); }
+    
+    .pet-profile { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), #ff8fab); display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 4px 10px rgba(255,45,110,0.2); }
+    .pet-name { font-size: 20px; font-weight: 700; }
+    .pet-info { font-size: 14px; color: var(--text-dim); }
+
+    .status-banner { padding: 12px 16px; border-radius: 16px; font-weight: 700; font-size: 14px; text-align: center; transition: background 0.3s; display: flex; flex-direction: column; gap: 4px; }
+    .status-banner.verde { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .status-banner.amarelo { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+    .status-banner.vermelho { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; animation: pulse 1.5s infinite; }
+    .status-banner span { font-size: 12px; font-weight: 500; opacity: 0.8; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; transform: scale(0.98); } 100% { opacity: 1; } }
+
+    .content { padding: 24px; }
+    .card { background: var(--card); padding: 20px; border-radius: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+    .card-icon { width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .card-info { flex: 1; margin-left: 16px; }
+    .card-label { font-size: 13px; color: var(--text-dim); font-weight: 600; text-transform: uppercase; }
+    .card-value { font-size: 24px; font-weight: 800; color: var(--text); margin-top: 4px; }
+    .card-unit { font-size: 14px; font-weight: 500; color: var(--text-dim); }
+
+    .bg-red { background: #ffe4e6; color: #e11d48; } .bg-blue { background: #dbeafe; color: #2563eb; } .bg-green { background: #dcfce7; color: #166534; }
+
+    .activity-section { margin-top: 32px; text-align: center; }
+    .activity-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .activity-desc { font-size: 14px; color: var(--text-dim); margin-bottom: 24px; }
+    .btn-play { background: var(--brand); color: white; border: none; width: 100%; padding: 20px; border-radius: 20px; font-size: 18px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(255,45,110,0.4); transition: all 0.2s; }
+    .btn-play:active { transform: scale(0.96); }
+    .btn-play.active { background: #0f172a; box-shadow: 0 10px 25px rgba(15,23,42,0.4); }
+  </style>
+</head>
+<body>
+  <div class="mobile-app">
+    <div class="header">
+      <div class="header-top">
+        <div class="greeting">Olá, Maria 👋</div>
+      </div>
+      <div class="pet-profile">
+        <div class="avatar">🐕</div>
+        <div>
+          <div class="pet-name">Rex</div>
+          <div class="pet-info">Sincronizado via IoT</div>
+        </div>
+      </div>
+      <div class="status-banner verde" id="bannerStatus">
+        STATUS: REPOUSO E SAUDÁVEL
+        <span>Sinais vitais normais e estabilizados.</span>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="card"><div class="card-icon bg-red">❤️</div><div class="card-info"><div class="card-label">Coração</div><div class="card-value"><span id="valBPM">--</span> <span class="card-unit">BPM</span></div></div></div>
+      <div class="card"><div class="card-icon bg-blue">🌡️</div><div class="card-info"><div class="card-label">Temperatura</div><div class="card-value"><span id="valTemp">--</span> <span class="card-unit">°C</span></div></div></div>
+      <div class="card"><div class="card-icon bg-green">🐾</div><div class="card-info"><div class="card-label">Percorrido Hoje</div><div class="card-value"><span id="valDist">0</span> <span class="card-unit" id="unitDist">m</span></div></div></div>
+
+      <div class="activity-section">
+        <div class="activity-title">Hora do Passeio?</div>
+        <div class="activity-desc">Dê o Play para ativar o motor de simulação biológica do Rex.</div>
+        <button class="btn-play" id="btnAtividade" onclick="toggleAtividade()">▶️ INICIAR ATIVIDADE</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BROKER_URL = 'wss://broker.hivemq.com:8884/mqtt';
+    const TOPIC_TELE = 'clyvo/pet/rm561337/telemetria';
+    const TOPIC_CMD  = 'clyvo/pet/rm561337/comando';
+
+    const client = mqtt.connect(BROKER_URL, { clientId: 'clyvo_tutor_' + Math.random().toString(16).slice(2, 8) });
+    let emAtividade = false;
+
+    client.on('connect', () => { client.subscribe(TOPIC_TELE); });
+
+    client.on('message', (topic, payload) => {
+      try {
+        const msg = JSON.parse(payload.toString());
+        if (topic === TOPIC_TELE) {
+          document.getElementById('valTemp').textContent = msg.temperatura.toFixed(1);
+          document.getElementById('valBPM').textContent = msg.bpm || '--';
+          
+          let metros = msg.distancia_m || 0;
+          if (metros >= 1000) { document.getElementById('valDist').textContent = (metros / 1000).toFixed(2); document.getElementById('unitDist').textContent = 'km'; } 
+          else { document.getElementById('valDist').textContent = metros.toFixed(0); document.getElementById('unitDist').textContent = 'm'; }
+
+          const banner = document.getElementById('bannerStatus');
+          banner.className = 'status-banner ' + msg.status_saude;
+          if (msg.status_saude === 'verde') banner.innerHTML = 'STATUS: REPOUSO E SAUDÁVEL<br><span>Sinais vitais normais e estabilizados.</span>';
+          if (msg.status_saude === 'amarelo') banner.innerHTML = 'STATUS: EM ATIVIDADE<br><span>Esforço físico detectado. Queimando energia!</span>';
+          if (msg.status_saude === 'vermelho') banner.innerHTML = '🚨 ALERTA CRÍTICO 🚨<br><span>Sinais vitais perigosos! Interrompa e busque um veterinário.</span>';
+
+          if(msg.em_atividade !== undefined && msg.em_atividade !== emAtividade) {
+            emAtividade = msg.em_atividade; atualizarBotao();
+          }
+        }
+      } catch (e) {}
+    });
+
+    function toggleAtividade() {
+      emAtividade = !emAtividade;
+      client.publish(TOPIC_CMD, JSON.stringify({ atividade: emAtividade }));
+      atualizarBotao();
+    }
+
+    function atualizarBotao() {
+      const btn = document.getElementById('btnAtividade');
+      if (emAtividade) { btn.classList.add('active'); btn.innerHTML = '⏹️ FINALIZAR ATIVIDADE'; } 
+      else { btn.classList.remove('active'); btn.innerHTML = '▶️ INICIAR ATIVIDADE'; }
+    }
+  </script>
+</body>
+</html>

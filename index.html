@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clyvo Pet — Dashboard Clínico</title>
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root { --bg: #0b0f19; --card: #151b2b; --border: #232d45; --text: #f1f5f9; --text-dim: #94a3b8; --accent: #ff2d6e; --green: #10b981; --yellow: #f59e0b; --red: #ef4444; --blue: #3b82f6; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
+    body { background: radial-gradient(circle at top left, #121a2f 0%, var(--bg) 100%); color: var(--text); min-height: 100vh; padding: 32px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+    .logo { font-size: 32px; font-weight: 800; color: var(--accent); letter-spacing: -1px; }
+    .logo span { color: var(--text); font-weight: 300; }
+    .status-conn { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; color: var(--text-dim); background: rgba(255,255,255,0.05); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--red); }
+    .dot.online { background: var(--green); box-shadow: 0 0 12px var(--green); }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-bottom: 32px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+    .card-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); margin-bottom: 12px; font-weight: 600; }
+    .card-value { font-size: 38px; font-weight: 800; margin-bottom: 8px; background: linear-gradient(180deg, #fff 0%, #cbd5e1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .card-unit { font-size: 16px; color: var(--text-dim); font-weight: 500; -webkit-text-fill-color: var(--text-dim); }
+    .card-sub { font-size: 13px; color: var(--text-dim); }
+
+    .status-card { text-align: center; display: flex; flex-direction: column; justify-content: center; grid-column: span 2; transition: all 0.3s; }
+    .status-card.verde { border-color: rgba(16, 185, 129, 0.5); background: linear-gradient(180deg, rgba(16, 185, 129, 0.1) 0%, var(--card) 100%); }
+    .status-card.amarelo { border-color: rgba(245, 158, 11, 0.5); background: linear-gradient(180deg, rgba(245, 158, 11, 0.1) 0%, var(--card) 100%); }
+    .status-card.vermelho { border-color: var(--red); background: linear-gradient(180deg, rgba(239, 68, 68, 0.15) 0%, var(--card) 100%); box-shadow: 0 0 20px rgba(239, 68, 68, 0.2); }
+    .status-text { font-size: 26px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; }
+    .verde .status-text { color: var(--green); } .amarelo .status-text { color: var(--yellow); } .vermelho .status-text { color: var(--red); }
+
+    .chart-card { padding: 24px; min-height: 350px; }
+    .chart-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+    
+    .alerts { max-height: 250px; overflow-y: auto; padding-right: 8px; }
+    .alerts::-webkit-scrollbar { width: 6px; } .alerts::-webkit-scrollbar-track { background: var(--bg); border-radius: 4px; } .alerts::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .alert-item { display: flex; flex-direction: column; padding: 16px; border-radius: 10px; margin-bottom: 12px; font-size: 14px; line-height: 1.5; border-left: 4px solid var(--text-dim); background: rgba(255,255,255,0.05); }
+    .alert-item strong { font-size: 12px; letter-spacing: 1px; margin-bottom: 4px; }
+    .alert-item.critico { background: rgba(239, 68, 68, 0.05); border-left-color: var(--red); } .alert-item.critico strong { color: var(--red); }
+    .alert-item.atencao { background: rgba(245, 158, 11, 0.05); border-left-color: var(--yellow); } .alert-item.atencao strong { color: var(--yellow); }
+    .alert-item.info { background: rgba(16, 185, 129, 0.05); border-left-color: var(--green); } .alert-item.info strong { color: var(--green); }
+    .alert-time { color: var(--text-dim); font-size: 11px; margin-top: 8px; text-align: right; }
+
+    .pet-info { display: flex; align-items: center; gap: 20px; }
+    .pet-avatar { width: 72px; height: 72px; border-radius: 20px; background: linear-gradient(135deg, var(--accent), #ff8fab); display: flex; align-items: center; justify-content: center; font-size: 36px; }
+    .pet-name { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+    .pet-badge { background: var(--border); font-size: 12px; padding: 4px 8px; border-radius: 6px; font-weight: 600; color: var(--text-dim); margin-left: 8px; }
+    .pet-details { font-size: 15px; color: var(--text-dim); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">CLYVO <span>CLINIC</span></div>
+    <div class="status-conn"><span class="dot" id="connDot"></span><span id="connText">Aguardando Conexão...</span></div>
+  </header>
+
+  <div class="card" style="margin-bottom: 32px;">
+    <div class="pet-info">
+      <div class="pet-avatar">🐕</div>
+      <div>
+        <div class="pet-name">Rex <span class="pet-badge">PET001</span></div>
+        <div class="pet-details">Golden Retriever • 4 anos • Tutor: Maria Silva • Monitoramento Remoto Ativo</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card status-card verde" id="statusCard">
+      <div class="card-label">🩺 Painel de Triagem</div>
+      <div class="status-text" id="statusText">Aguardando...</div>
+      <div class="card-sub" id="statusSub">Aguardando dados vitais</div>
+    </div>
+    <div class="card">
+      <div class="card-label">🌡️ Temperatura Central</div>
+      <div class="card-value"><span id="temp">--</span><span class="card-unit"> °C</span></div>
+      <div class="card-sub">Limite clínico: 39.5 °C</div>
+    </div>
+    <div class="card">
+      <div class="card-label">💓 Ritmo Cardíaco</div>
+      <div class="card-value"><span id="bpm">--</span><span class="card-unit"> bpm</span></div>
+      <div class="card-sub">Limite clínico: 150 bpm</div>
+    </div>
+    <div class="card">
+      <div class="card-label">📍 Distância (Gasto Calórico)</div>
+      <div class="card-value"><span id="dist">--</span><span class="card-unit" id="unitDist"> m</span></div>
+      <div class="card-sub" id="atividade">Analisando padrão motor...</div>
+    </div>
+  </div>
+
+  <div class="grid" style="grid-template-columns: 2fr 1fr;">
+    <div class="card chart-card">
+      <div class="chart-title">📈 Evolução Térmica do Paciente</div>
+      <div style="height: 300px; width: 100%;"><canvas id="chartTemp"></canvas></div>
+    </div>
+    <div class="card chart-card">
+      <div class="chart-title">🚨 Central de Alertas</div>
+      <div class="alerts" id="alertsBox">
+        <div style="color: var(--text-dim); font-size: 14px; text-align: center; padding-top: 40px;">Conectando ao wearable...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BROKER_URL = 'wss://broker.hivemq.com:8884/mqtt';
+    const TOPIC_TELE = 'clyvo/pet/rm561337/telemetria';
+    const TOPIC_ALERT = 'clyvo/pet/rm561337/alerta';
+
+    const client = mqtt.connect(BROKER_URL, { clientId: 'clyvo_admin_' + Math.random().toString(16).slice(2, 8) });
+
+    client.on('connect', () => {
+      document.getElementById('connDot').classList.add('online');
+      document.getElementById('connText').textContent = 'Broker Clínico Online';
+      client.subscribe([TOPIC_TELE, TOPIC_ALERT]);
+    });
+
+    client.on('message', (topic, payload) => {
+      try {
+        const msg = JSON.parse(payload.toString());
+        if (topic === TOPIC_TELE && msg.status_saude) atualizarTelemetria(msg);
+        else if (topic === TOPIC_ALERT) registrarAlerta(msg.nivel, msg.mensagem);
+      } catch (e) {}
+    });
+
+    function atualizarTelemetria(d) {
+      document.getElementById('temp').textContent = d.temperatura.toFixed(1);
+      document.getElementById('bpm').textContent = d.bpm || '--';
+      
+      let metros = d.distancia_m || 0;
+      if (metros >= 1000) { document.getElementById('dist').textContent = (metros / 1000).toFixed(2); document.getElementById('unitDist').textContent = ' km'; } 
+      else { document.getElementById('dist').textContent = metros.toFixed(0); document.getElementById('unitDist').textContent = ' m'; }
+      
+      const elAtividade = document.getElementById('atividade');
+      if (d.em_atividade) elAtividade.innerHTML = '<span style="color: var(--yellow);">⚠️ Paciente em exercício físico</span>';
+      else elAtividade.innerHTML = '<span style="color: var(--green);">✔️ Paciente em repouso</span>';
+
+      const statusCard = document.getElementById('statusCard');
+      const statusText = document.getElementById('statusText');
+      const statusSub = document.getElementById('statusSub');
+      
+      statusCard.classList.remove('verde', 'amarelo', 'vermelho');
+      statusCard.classList.add(d.status_saude);
+
+      const labels = {
+        verde: { txt: 'Quadro Estável', sub: 'Sem risco clínico iminente' },
+        amarelo: { txt: 'Quadro de Esforço', sub: 'Metabolismo acelerado devido à atividade' },
+        vermelho: { txt: 'Risco Clínico', sub: 'Alerta! Exigida intervenção veterinária imediata.' }
+      };
+      
+      statusText.textContent = labels[d.status_saude].txt;
+      statusSub.textContent = labels[d.status_saude].sub;
+
+      atualizarGrafico(d.temperatura);
+    }
+
+    function registrarAlerta(nivel, mensagem) {
+      const box = document.getElementById('alertsBox');
+      if (box.querySelector('div[style]')) box.innerHTML = '';
+      
+      const item = document.createElement('div');
+      item.className = 'alert-item ' + nivel;
+      const hora = new Date().toLocaleTimeString('pt-BR');
+      
+      let titulo = 'ATUALIZAÇÃO DE SISTEMA';
+      if(nivel === 'atencao') titulo = 'MUDANÇA DE COMPORTAMENTO';
+      if(nivel === 'critico') titulo = '⚠️ EMERGÊNCIA VETERINÁRIA';
+      
+      item.innerHTML = `<strong>${titulo}</strong><span>${mensagem}</span><div class="alert-time">${hora}</div>`;
+      box.insertBefore(item, box.firstChild);
+      while (box.children.length > 8) box.removeChild(box.lastChild);
+    }
+
+    const ctx = document.getElementById('chartTemp').getContext('2d');
+    const gradientFill = ctx.createLinearGradient(0, 0, 0, 300);
+    gradientFill.addColorStop(0, 'rgba(255, 45, 110, 0.4)'); gradientFill.addColorStop(1, 'rgba(255, 45, 110, 0.01)');
+
+    const chartTemp = new Chart(ctx, {
+      type: 'line',
+      data: { labels: [], datasets: [{ label: 'Temperatura (°C)', data: [], borderColor: '#ff2d6e', backgroundColor: gradientFill, borderWidth: 3, tension: 0.4, fill: true, pointRadius: 0 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { ticks: { color: '#94a3b8' }, grid: { color: '#232d45', borderDash: [4, 4] }, suggestedMin: 35, suggestedMax: 42 } } }
+    });
+
+    function atualizarGrafico(temp) {
+      chartTemp.data.labels.push(new Date().toLocaleTimeString('pt-BR'));
+      chartTemp.data.datasets[0].data.push(temp);
+      if (chartTemp.data.labels.length > 20) { chartTemp.data.labels.shift(); chartTemp.data.datasets[0].data.shift(); }
+      chartTemp.update('none'); 
+    }
+  </script>
+</body>
+</html>
