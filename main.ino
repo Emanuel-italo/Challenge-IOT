@@ -93,6 +93,18 @@ void loop() {
 
     atualizarLedRGB(status);
     tocarAlerta(status);
+
+    // --- LOGS PARA O MONITOR SERIAL ---
+    Serial.print("Temp: "); 
+    Serial.print(temperatura);
+    Serial.print("C | Umid: "); 
+    Serial.print(umidade);
+    Serial.print("% | Dist: "); 
+    Serial.print(distancia);
+    Serial.print("cm | Score de Risco: "); 
+    Serial.println(status);
+    // ----------------------------------
+
     publicarTelemetria(temperatura, umidade, distancia, status);
   }
 }
@@ -212,6 +224,11 @@ void publicarAlerta(const char* mensagem, int status) {
 void callbackMQTT(char* topic, byte* payload, unsigned int length) {
   String msg;
   for (unsigned int i = 0; i < length; i++) msg += (char)payload[i];
+
+  // --- LOG DO COMANDO RECEBIDO ---
+  Serial.print("Comando recebido da clinica/tutor: ");
+  Serial.println(msg);
+  // -------------------------------
 
   JsonDocument json;
   DeserializationError err = deserializeJson(json, msg);
