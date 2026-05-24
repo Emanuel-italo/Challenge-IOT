@@ -1,9 +1,8 @@
 Integrantes:
 
 1- RM563811 Paulo Henrique Alves Estalise
-2- RM561337 Emanuel Italo
-3- RM565824 Pedro Ferreira 
-4- RM562012 Gabriel Bebe
+2- RM561337 Emanuel Italo 
+3- RM562012 Gabriel Bebe
 
 link_git_hub: https://github.com/Emanuel-italo/Challenge-IOT
 
